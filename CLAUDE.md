@@ -72,9 +72,21 @@ uv run python scripts/run_pipeline.py --config configs/fraud.yaml
   `scripts/generate_synthetic.py` genera datos con el **mismo esquema** (~0.13% fraude,
   desbalance realista). El núcleo no distingue entre ambos.
 
+- **2026-06-15** — `target_precision` es un **knob de negocio** en el config, no un valor
+  sagrado. En el dataset sintético (0.6% fraude) con 0.90 el umbral quedaba en 1.0 (recall
+  ~2%); se fijó en **0.50**, que da un punto de operación ilustrativo (umbral ~0.42,
+  precisión ~0.67, recall ~0.22). La calibración elige isotónica vs Platt por Brier.
+
+## Resultados de referencia (dataset sintético 200k, 0.6% fraude)
+
+ROC-AUC ~0.98, PR-AUC calibrado ~0.37 (≈60× sobre azar), Brier 0.0064 → **0.0043** con
+calibración isotónica. Punto de operación @ precisión objetivo 0.50: umbral ~0.42,
+precisión ~0.67, recall ~0.22. (Cambiarán con el dataset real de Kaggle.)
+
 ## Estado actual
 
-Fases 0 y 1 completas. **Fase 0:** entorno uv, scaffolding, CI, pre-commit, config-driven.
-**Fase 1:** ingesta PySpark CSV→Parquet, esquema Pandera de fraude y validación trazable
-(falla temprano), con 14 tests verdes. Próximo: **Fase 2** (features + LightGBM +
-calibración + MLflow). Plan completo por fases en el plan aprobado de la sesión.
+Fases 0, 1 y 2 completas. **Fase 0:** entorno uv, scaffolding, CI, pre-commit.
+**Fase 1:** ingesta PySpark CSV→Parquet + validación Pandera trazable. **Fase 2:** features
+agnósticas al dominio (fecha + distancia haversine), LightGBM con desbalance, calibración
+isotónica/Platt por Brier, métricas honestas (PR-AUC/Brier) y tracking MLflow; modelo
+calibrado serializado para serving. **27 tests verdes.** Próximo: **Fase 3** (drift PSI/KS).

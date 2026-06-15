@@ -37,18 +37,19 @@ def generate(rows: int = 200_000, seed: int = 42, fraud_rate: float = 0.006) -> 
 
     amt = np.round(rng.lognormal(mean=3.2, sigma=1.1, size=rows), 2)
 
-    # Probabilidad de fraude crece con el monto y en categorías "net".
-    net = np.isin(category, ["misc_net", "shopping_net", "grocery_net"])
-    logit = -7.0 + 0.0009 * amt + 0.8 * net + rng.normal(0, 0.5, size=rows)
-    prob = 1.0 / (1.0 + np.exp(-logit))
-    is_fraud = (rng.uniform(size=rows) < prob).astype(int)
+    # Señal de fraude con tres fuentes reales: monto alto, categorías "net" y mayor
+    # distancia cardholder<->comercio (geo_distance). Se estandarizan para que pesen
+    # parejo, con ruido para que las clases NO sean perfectamente separables (realista).
+    # El fraude son los top-k por score, lo que fija la tasa exactamente en `fraud_rate`.
+    def _z(a: np.ndarray) -> np.ndarray:
+        return (a - a.mean()) / (a.std() + 1e-9)
 
-    # Reescala para acercarnos a la tasa objetivo manteniendo la señal.
-    target_n = int(rows * fraud_rate)
-    if is_fraud.sum() > target_n:
-        fraud_idx = np.flatnonzero(is_fraud)
-        drop = rng.choice(fraud_idx, size=is_fraud.sum() - target_n, replace=False)
-        is_fraud[drop] = 0
+    net = np.isin(category, ["misc_net", "shopping_net", "grocery_net"]).astype(float)
+    geo_disp = np.sqrt((merch_lat - lat) ** 2 + (merch_long - lon) ** 2)
+    score = 1.2 * _z(np.log1p(amt)) + 1.5 * net + 1.0 * _z(geo_disp) + rng.normal(0, 0.8, size=rows)
+    k = max(1, int(rows * fraud_rate))
+    threshold = np.sort(score)[rows - k]
+    is_fraud = (score >= threshold).astype(int)
 
     return pd.DataFrame(
         {

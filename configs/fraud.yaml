@@ -31,7 +31,7 @@ calibration:
   method: auto   # auto = elige isotónica o Platt por mejor Brier en validación
 
 evaluation:
-  target_precision: 0.90   # umbral de bloqueo derivado de esta precisión objetivo
+  target_precision: 0.50   # umbral de bloqueo derivado de esta precisión objetivo (knob de negocio)
 
 drift:
   psi_threshold: 0.2          # PSI > 0.2 => cambio relevante de distribución
