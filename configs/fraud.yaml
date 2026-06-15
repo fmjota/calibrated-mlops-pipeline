@@ -1,0 +1,38 @@
+# Dominio banca/retail — detección de fraude transaccional en tarjetas.
+# El núcleo del pipeline es agnóstico al dominio; este archivo lo parametriza.
+domain: fraud
+description: "Detección de fraude transaccional en tarjetas (banca). Desbalance fuerte (~0.5%)."
+
+data:
+  raw_path: "data/raw/fraud_train.csv"
+  parquet_path: "data/processed/fraud.parquet"
+
+target: "is_fraud"
+positive_label: 1
+
+columns:
+  datetime: "trans_date_trans_time"
+  amount: "amt"
+  categorical: ["category", "gender", "state"]
+  numeric: ["amt", "city_pop", "lat", "long", "merch_lat", "merch_long"]
+
+model:
+  type: lightgbm
+  params:
+    objective: binary
+    n_estimators: 400
+    learning_rate: 0.05
+    num_leaves: 64
+    is_unbalance: true
+  time_split_column: "trans_date_trans_time"
+  valid_fraction: 0.2
+
+calibration:
+  method: auto   # auto = elige isotónica o Platt por mejor Brier en validación
+
+evaluation:
+  target_precision: 0.90   # umbral de bloqueo derivado de esta precisión objetivo
+
+drift:
+  psi_threshold: 0.2          # PSI > 0.2 => cambio relevante de distribución
+  ks_pvalue_threshold: 0.05   # KS p-valor < 0.05 => distribución distinta
