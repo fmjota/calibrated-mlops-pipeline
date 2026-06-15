@@ -85,8 +85,10 @@ precisión ~0.67, recall ~0.22. (Cambiarán con el dataset real de Kaggle.)
 
 ## Estado actual
 
-Fases 0, 1 y 2 completas. **Fase 0:** entorno uv, scaffolding, CI, pre-commit.
+Fases 0-3 completas. **Fase 0:** entorno uv, scaffolding, CI, pre-commit.
 **Fase 1:** ingesta PySpark CSV→Parquet + validación Pandera trazable. **Fase 2:** features
 agnósticas al dominio (fecha + distancia haversine), LightGBM con desbalance, calibración
 isotónica/Platt por Brier, métricas honestas (PR-AUC/Brier) y tracking MLflow; modelo
-calibrado serializado para serving. **27 tests verdes.** Próximo: **Fase 3** (drift PSI/KS).
+calibrado serializado para serving. **Fase 3:** detección de drift por feature (PSI + KS)
+referencia vs producción, con umbrales del config. **31 tests verdes.** Próximo: **Fase 4**
+(serving FastAPI + Docker).
