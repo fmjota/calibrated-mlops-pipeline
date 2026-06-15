@@ -63,13 +63,18 @@ uv run python scripts/run_pipeline.py --config configs/fraud.yaml
   vienen después sobre el mismo núcleo.
 - **2026-06-15** — Entorno **uv** (no venv plano). Repos: **una subcarpeta por proyecto**
   del portafolio; este es `proyecto-1-mlops/`.
-- **2026-06-15** — **PySpark + JDK 17**. La notebook tiene Java 25, que Spark aún no
-  soporta; se usará un JDK 17 dedicado con `JAVA_HOME` apuntado a él (sin cambiar el
-  Java por defecto del sistema).
-- **2026-06-15** — Dataset propuesto: *Credit Card Transactions Fraud Detection*
-  (Sparkov, ~1.85M filas). Alternativa liviana: ULB `creditcard.csv` (285k, PCA).
+- **2026-06-15** — **PySpark 4.1 + Temurin 21 (LTS) a nivel de usuario**. Fedora 44 solo
+  trae Java 25/26 en repos (no 17/21), y Spark 4.x no soporta Java 25. Se instaló un JDK
+  21 portable en `~/.local/share/jvm/jdk-21*` (sin sudo, sin tocar el sistema).
+  `mlops_core.spark.get_spark()` descubre ese JDK y fija `JAVA_HOME` solo para Spark.
+- **2026-06-15** — Datos: el ETL apunta al dataset **Sparkov** real (`download_data.sh`
+  vía Kaggle si hay credenciales). Como fallback portable —tests/CI/demo sin credenciales—
+  `scripts/generate_synthetic.py` genera datos con el **mismo esquema** (~0.13% fraude,
+  desbalance realista). El núcleo no distingue entre ambos.
 
 ## Estado actual
 
-Fase 0 (scaffolding + entorno) en curso. Plan completo por fases en la raíz del
-portafolio (`prompt-portafolio-proyectos-github.md`) y en el plan aprobado de la sesión.
+Fases 0 y 1 completas. **Fase 0:** entorno uv, scaffolding, CI, pre-commit, config-driven.
+**Fase 1:** ingesta PySpark CSV→Parquet, esquema Pandera de fraude y validación trazable
+(falla temprano), con 14 tests verdes. Próximo: **Fase 2** (features + LightGBM +
+calibración + MLflow). Plan completo por fases en el plan aprobado de la sesión.
