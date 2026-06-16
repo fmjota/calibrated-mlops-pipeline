@@ -131,7 +131,18 @@ El mismo núcleo se demuestra sobre tres dominios cambiando `config` + esquema:
   intervalos de incertidumbre (Fase 6).
 - **Educación** — deserción: el **drift** detecta cambios de cohorte año a año (Fase 6).
 
-## 8. Estado por fases
+## 8. Dominios implementados (regla multi-dominio)
+
+| Dominio | Config | Modelo | Dataset | Técnica diferencial |
+|---|---|---|---|---|
+| **Banca/retail** | `configs/fraud.yaml` | LightGBM + calibración | Sparkov sintético (200k, 0.6% fraude) | PR-AUC, Brier, umbral de bloqueo calibrado |
+| **Salud** | `configs/readmission.yaml` | **PyMC bayesiano** | UCI Diabetes 130-US Hospitals (102k, 11% readmisión <30d) | Intervalos creíbles 90%, umbral clínico, IC coverage |
+| **Educación** | `configs/dropout.yaml` | LightGBM (misma clase) | UCI Students Dropout (4.4k, 32% deserción) | Drift PSI/KS detecta cambio de cohorte año a año |
+
+Mismo código de modelo/calibración/serving para los tres. La generalización se demuestra
+cambiando solo el YAML + el schema Pandera.
+
+## 9. Estado por fases
 
 | Fase | Contenido | Estado |
 |---|---|---|
@@ -139,6 +150,6 @@ El mismo núcleo se demuestra sobre tres dominios cambiando `config` + esquema:
 | 1 | Ingesta PySpark + validación Pandera | ✅ |
 | 2 | Features + LightGBM + calibración + MLflow | ✅ |
 | 3 | Drift PSI/KS | ✅ |
-| 4 | Serving FastAPI + Docker | 🚧 (API y tests ✅; `compose up` en vivo pendiente del runtime) |
-| 5 | Orquestación end-to-end + README profesional | ⏳ |
-| 6 | Multi-dominio (salud bayesiano + educación) | ⏳ |
+| 4 | Serving FastAPI + Docker (Podman en Fedora) | ✅ |
+| 5 | Orquestación end-to-end + README profesional | ✅ |
+| 6 | Multi-dominio: salud bayesiano (PyMC) + educación (drift de cohorte) | ✅ |

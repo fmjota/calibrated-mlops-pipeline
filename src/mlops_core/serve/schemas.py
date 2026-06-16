@@ -47,3 +47,9 @@ class PredictionResponse(BaseModel):
     decision: int = Field(description="1 si probability >= umbral, 0 si no.")
     threshold: float = Field(description="Umbral de decisión del modelo.")
     domain: str
+    ci_low: float | None = Field(
+        default=None, description="Extremo inferior del intervalo creíble (solo modelo bayesiano)."
+    )
+    ci_high: float | None = Field(
+        default=None, description="Extremo superior del intervalo creíble (solo modelo bayesiano)."
+    )

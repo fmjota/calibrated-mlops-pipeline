@@ -124,10 +124,10 @@ calibración isotónica/Platt por Brier, métricas honestas + MLflow; modelo ser
 vivo con uvicorn + Dockerfile/compose. **Docs:** `docs/` (vision-tecnica, referencia-codigo,
 glosario). **35 tests verdes.**
 
-**Fases 4 y 5 completas.** Fase 5: `scripts/run_pipeline.py --config configs/fraud.yaml`
-orquesta ETL→validación→train→calibración→eval→drift; README con métricas reales. Fase 4:
-**contenedor verificado con Podman** (rootless, sin sudo) — `/predict` responde desde el
-contenedor. Ver `docs/podman-vs-docker.md`. **36 tests verdes.**
+**Fases 0-6 completas.** Fase 4: contenedor verificado con Podman. Fase 5: `run_pipeline.py`
++ README con métricas reales. **Fase 6 (multi-dominio):** salud (PyMC bayesiano, intervalos
+creíbles 90%, UCI 102k filas) + educación (LightGBM sin cambios, UCI 4.4k, drift detecta
+cambio de cohorte). **48 tests verdes.** Regla multi-dominio cumplida: mismo núcleo, 3 configs.
 
 ### Fase 6 — diseño aprobado (implementar en Sonnet 4.6)
 

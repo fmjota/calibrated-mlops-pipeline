@@ -4,10 +4,14 @@ from __future__ import annotations
 
 from pandera.pandas import DataFrameSchema
 
+from mlops_core.schemas.dropout import dropout_schema
 from mlops_core.schemas.fraud import fraud_schema
+from mlops_core.schemas.readmission import readmission_schema
 
 _REGISTRY: dict[str, DataFrameSchema] = {
     "fraud": fraud_schema,
+    "readmission": readmission_schema,
+    "dropout": dropout_schema,
 }
 
 
@@ -22,4 +26,4 @@ def get_schema(domain: str) -> DataFrameSchema:
         ) from None
 
 
-__all__ = ["fraud_schema", "get_schema"]
+__all__ = ["fraud_schema", "readmission_schema", "dropout_schema", "get_schema"]

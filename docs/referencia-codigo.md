@@ -36,7 +36,11 @@ produce y **depende de** qué otros módulos. Mantener sincronizado con los docs
 
 | Archivo | Propósito |
 |---|---|
-| `fraud.yaml` | Parametriza el núcleo para el dominio banca/fraude (columnas, modelo, calibración, umbral, drift) |
+| `fraud.yaml` | Dominio banca/fraude; `model.type: lightgbm`, calibración auto, target_precision 0.50 |
+| `readmission.yaml` | Dominio salud (reingreso <30d); `model.type: bayesian` + PyMC + IC 90% |
+| `dropout.yaml` | Dominio educación (deserción); LightGBM sin is_unbalance; PSI threshold 0.1 |
+
+> Agregar un dominio nuevo = crear un YAML + un `schemas/<domain>.py` + registrarlo en `schemas/__init__.py`. Sin tocar código del núcleo.
 
 ## `tests/`
 
@@ -53,3 +57,6 @@ produce y **depende de** qué otros módulos. Mantener sincronizado con los docs
 | `test_train.py` | Entrena, calibra, persiste y predice |
 | `test_drift.py` | No marca datos estables; sí marca corrimiento |
 | `test_api.py` | health, predict válido, rechazo de inválidos |
+| `test_pipeline.py` | Orquestación end-to-end sin Spark (Parquet pre-existente) |
+| `test_readmission.py` | Schema salud + modelo bayesiano: proba, IC, roundtrip |
+| `test_dropout.py` | Schema educación + núcleo LightGBM + drift de cohorte |

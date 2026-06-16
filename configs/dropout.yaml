@@ -1,0 +1,48 @@
+# Dominio educación — riesgo de deserción estudiantil.
+# El núcleo es exactamente el mismo que en fraude (LightGBM). Solo cambia config + esquema.
+# El argumento de generalización: el drift PSI/KS detecta cambios de cohorte año a año,
+# lo mismo que la detección de señales aplicada al modelo (eco de la farmacovigilancia).
+domain: dropout
+description: "Riesgo de deserción/abandono estudiantil. Probabilidad calibrada para priorizar intervenciones; el drift detecta cambios de cohorte año a año."
+
+data:
+  raw_path: "data/raw/dropout_train.csv"
+  parquet_path: "data/processed/dropout.parquet"
+
+target: "dropout"
+positive_label: 1
+
+columns:
+  numeric:
+    - "Previous qualification (grade)"
+    - "Admission grade"
+    - "Age at enrollment"
+    - "Curricular units 1st sem (approved)"
+    - "Curricular units 2nd sem (approved)"
+    - "Curricular units 1st sem (grade)"
+    - "Curricular units 2nd sem (grade)"
+    - "Unemployment rate"
+    - "Inflation rate"
+    - "GDP"
+  categorical: []    # todas las columnas categóricas son int codificado; van a numeric o se omiten
+
+model:
+  type: lightgbm
+  params:
+    objective: binary
+    n_estimators: 300
+    learning_rate: 0.05
+    num_leaves: 32
+    is_unbalance: false   # 32% positivos no es desbalance fuerte; no usar is_unbalance
+  time_split_column: null
+  valid_fraction: 0.2
+
+calibration:
+  method: auto
+
+evaluation:
+  target_precision: 0.65   # umbral de intervención: priorizamos capturar desertores
+
+drift:
+  psi_threshold: 0.1        # umbral más sensible en educación (cohortes anuales cambian gradual)
+  ks_pvalue_threshold: 0.05

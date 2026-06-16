@@ -42,9 +42,16 @@ def predict(tx: Transaction) -> PredictionResponse:
 
     df = pd.DataFrame([tx.model_dump()])
     prob = float(model.predict_proba(df)[0])
+    ci_low, ci_high = None, None
+    if model.is_bayesian:
+        intervals = model.predict_interval(df)
+        if intervals is not None:
+            ci_low, ci_high = float(intervals[0, 0]), float(intervals[0, 1])
     return PredictionResponse(
         probability=prob,
         decision=int(prob >= model.threshold),
         threshold=float(model.threshold),
         domain=model.config.domain,
+        ci_low=ci_low,
+        ci_high=ci_high,
     )

@@ -1,0 +1,62 @@
+# Dominio salud — riesgo de reingreso hospitalario en <30 días.
+# Mismo núcleo que fraude; la diferencia es model.type: bayesian, que activa
+# la regresión logística bayesiana con PyMC y entrega intervalos creíbles.
+domain: readmission
+description: "Riesgo de reingreso hospitalario en <30 días (salud). Variante bayesiana con intervalos de incertidumbre defendibles ante comité clínico."
+
+data:
+  raw_path: "data/raw/readmission_train.csv"
+  parquet_path: "data/processed/readmission.parquet"
+
+target: "readmitted_30d"
+positive_label: 1
+
+columns:
+  numeric:
+    - time_in_hospital
+    - num_lab_procedures
+    - num_procedures
+    - num_medications
+    - number_outpatient
+    - number_emergency
+    - number_inpatient
+    - number_diagnoses
+  categorical:
+    - race
+    - gender
+    - age
+    - change
+    - diabetesMed
+    - metformin
+    - repaglinide
+    - nateglinide
+    - chlorpropamide
+    - glimepiride
+    - glipizide
+    - glyburide
+    - pioglitazone
+    - rosiglitazone
+    - acarbose
+    - insulin
+
+model:
+  type: bayesian          # activa models/bayesian.py en vez de LightGBM
+  params:
+    draws: 500            # muestras NUTS por cadena
+    tune: 200             # pasos de warm-up
+    chains: 2             # cadenas paralelas
+    target_accept: 0.9
+    sample_size: 10000    # subsample estratificado para NUTS (escala)
+  time_split_column: null # sin columna temporal; se parte aleatoriamente
+  valid_fraction: 0.2
+
+calibration:
+  method: none   # la posterior bayesiana viene calibrada; reportamos Brier igual
+
+evaluation:
+  target_precision: 0.60   # umbral clínico: prioriza no perder reingresos
+  ci_level: 0.90           # nivel del intervalo creíble a reportar
+
+drift:
+  psi_threshold: 0.2
+  ks_pvalue_threshold: 0.05

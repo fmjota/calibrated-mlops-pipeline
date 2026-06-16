@@ -39,3 +39,20 @@ sola.
 - **PySpark.** API de Python para Apache Spark; procesamiento distribuido para ETL a escala.
 - **Núcleo agnóstico al dominio.** Código que no asume el caso de uso; se parametriza con un
   `config` + esquema por dominio (banca/salud/educación).
+- **Intervalo creíble (IC).** En estadística bayesiana: rango de valores que contiene el
+  parámetro de interés con probabilidad `level` (ej. IC 90% contiene el verdadero valor de
+  riesgo en el 90% de los casos). Más interpretable que el intervalo de confianza frecuentista.
+- **NUTS (No-U-Turn Sampler).** Algoritmo de MCMC usado por PyMC para muestrear la posterior.
+  Variante de HMC que se auto-calibra, produciendo muestras de alta calidad con bajo rechazo.
+- **Posterior predictiva.** Distribución de predicciones para nuevas observaciones, integrando
+  la incertidumbre sobre los parámetros del modelo. La media es la probabilidad calibrada;
+  los cuantiles son los extremos del intervalo creíble.
+- **IC Coverage (cobertura del intervalo).** Fracción de filas cuya probabilidad predicha cae
+  dentro del intervalo creíble. Una cobertura cercana al nivel nominal (ej. 90%) indica que
+  los intervalos están bien calibrados.
+- **Subsample estratificado.** Para escalar NUTS a datasets medianos: se toma una muestra
+  manteniendo la proporción de positivos y negativos del original.
+- **Dropout (deserción estudiantil).** Target del dominio educación: estudiante que abandona
+  la carrera sin graduarse. El modelo prioriza a quiénes intervenir.
+- **Readmission (reingreso hospitalario).** Target del dominio salud: readmisión en <30 días
+  (umbral clínico estándar, costosa y potencialmente prevenible).

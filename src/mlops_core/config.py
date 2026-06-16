@@ -41,6 +41,8 @@ class CalibrationConfig(BaseModel):
 class EvaluationConfig(BaseModel):
     # Precisión objetivo desde la que se deriva el umbral de bloqueo/intervención.
     target_precision: float = 0.9
+    # Nivel del intervalo creíble para la variante bayesiana (ej. 0.90 → IC 90%).
+    ci_level: float = 0.90
 
 
 class DriftConfig(BaseModel):
