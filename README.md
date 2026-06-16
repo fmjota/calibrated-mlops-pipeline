@@ -49,16 +49,39 @@ flowchart LR
 ## Cómo correr
 
 ```bash
-uv sync                       # entorno reproducible (Python 3.12)
-uv run pytest                 # tests
-uv run python scripts/run_pipeline.py --config configs/fraud.yaml
+uv sync                                  # entorno reproducible (Python 3.12 + JDK 21 auto)
+bash scripts/download_data.sh            # dataset (Kaggle si hay credenciales; si no, sintético)
+uv run python scripts/run_pipeline.py --config configs/fraud.yaml   # ETL→validación→train→drift
+uv run pytest                            # 36 tests
 ```
 
-Con Docker (próximamente, Fase 4):
+Servir el modelo como API de inferencia:
 
 ```bash
-docker compose up             # levanta API de inferencia + MLflow
+docker compose up                        # API FastAPI (:8000) + MLflow (:5000)
+# o sin contenedor:
+uv run uvicorn mlops_core.serve.api:app --port 8000
 ```
+
+```bash
+curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{
+  "trans_date_trans_time":"2020-06-01T12:30:00","amt":125.5,"category":"grocery_pos",
+  "gender":"F","state":"CA","city_pop":50000,"lat":37.77,"long":-122.41,
+  "merch_lat":37.80,"merch_long":-122.30}'
+# → {"probability":0.012,"decision":0,"threshold":0.4167,"domain":"fraud"}
+```
+
+## Resultados (dataset sintético 200k, 0.6% fraude)
+
+| Métrica | Valor | Lectura |
+|---|---|---|
+| ROC-AUC | **0.984** | ranking casi perfecto |
+| PR-AUC (calibrado) | **0.37** | ≈60× sobre el azar (prevalencia 0.006) |
+| Brier crudo → calibrado | 0.0064 → **0.0043** | la calibración mejora la probabilidad |
+| Punto de operación @ precisión objetivo 0.50 | umbral **0.42** · precisión 0.67 · recall 0.22 | knob de negocio en el `config` |
+
+> Métricas reproducibles con `run_pipeline.py`. Cambiarán con el dataset real de Kaggle.
+> El umbral se **deriva** de una precisión objetivo: significa algo, no es arbitrario.
 
 ## Documentación
 

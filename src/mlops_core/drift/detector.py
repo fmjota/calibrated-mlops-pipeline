@@ -87,7 +87,16 @@ def detect_drift(
     current: pd.DataFrame,
     cfg: DomainConfig,
 ) -> DriftReport:
-    """Compara features numéricas de `current` contra `reference` según los umbrales del config."""
+    """Compara features numéricas de `current` contra `reference` según los umbrales del config.
+
+    Args:
+        reference: datos de referencia (típicamente el periodo de entrenamiento).
+        current: datos actuales (producción / periodo reciente).
+        cfg: config del dominio; usa `columns.numeric` y los umbrales de `drift`.
+
+    Returns:
+        DriftReport: resultado por feature (PSI, KS, flag) y agregado.
+    """
     psi_thr = cfg.drift.psi_threshold
     ks_thr = cfg.drift.ks_pvalue_threshold
 

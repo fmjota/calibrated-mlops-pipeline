@@ -30,7 +30,7 @@ produce y **depende de** qué otros módulos. Mantener sincronizado con los docs
 |---|---|---|---|
 | `generate_synthetic.py` | Generar datos de fraude con el esquema Sparkov | `--rows`, `--seed`, `--out` | CSV en `data/raw/`; función `generate()` |
 | `download_data.sh` | Descargar dataset real (Kaggle) o caer al sintético | credenciales Kaggle (opcional) | `data/raw/fraud_train.csv` |
-| `run_pipeline.py` | (Fase 5) Orquestar ETL→…→drift por `--config` | `--config` | métricas + artefacto + reporte de drift |
+| `run_pipeline.py` | Orquestar ETL→validación→train→drift por `--config` | `--config`, `--skip-ingest`, `--no-mlflow` | métricas + artefacto + reporte de drift (stdout) |
 
 ## `configs/`
 

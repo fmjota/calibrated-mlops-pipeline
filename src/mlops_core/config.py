@@ -70,7 +70,17 @@ class DomainConfig(BaseModel):
 
 
 def load_config(path: str | Path) -> DomainConfig:
-    """Lee un YAML de dominio y lo valida contra el esquema Pydantic."""
+    """Lee un YAML de dominio y lo valida contra el esquema Pydantic.
+
+    Args:
+        path: ruta al archivo YAML del dominio (ej. `configs/fraud.yaml`).
+
+    Returns:
+        DomainConfig: config validado y tipado.
+
+    Raises:
+        pydantic.ValidationError: si el YAML no cumple el esquema.
+    """
     path = Path(path)
     with path.open("r", encoding="utf-8") as f:
         raw = yaml.safe_load(f)

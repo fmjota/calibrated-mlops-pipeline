@@ -32,7 +32,18 @@ def build_features(
     df: pd.DataFrame,
     categories: dict[str, list] | None = None,
 ) -> tuple[pd.DataFrame, pd.Series | None]:
-    """Devuelve (X, y). `y` es None si la columna target no está en `df` (inferencia)."""
+    """Construye la matriz de features y el target.
+
+    Args:
+        cfg: config del dominio (columnas numéricas, categóricas, datetime, target).
+        df: datos crudos (debe incluir las columnas declaradas en `cfg.columns`).
+        categories: categorías por columna categórica, para fijar códigos consistentes
+            entre train e inferencia. Si es None, se infieren del propio `df`.
+
+    Returns:
+        tuple[pd.DataFrame, pd.Series | None]: `(X, y)`. `y` es None si la columna
+        target no está en `df` (caso inferencia).
+    """
     df = df.copy()
 
     dtc = cfg.columns.datetime

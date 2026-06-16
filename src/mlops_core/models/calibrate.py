@@ -27,6 +27,7 @@ class Calibrator:
         self._model: object | None = None
 
     def fit(self, p, y) -> Calibrator:
+        """Ajusta el calibrador. Inputs: probas crudas `p` y labels `y` (0/1). Devuelve self."""
         p = np.asarray(p, dtype=float)
         y = np.asarray(y, dtype=int)
         if self.method == "isotonic":
@@ -36,6 +37,7 @@ class Calibrator:
         return self
 
     def transform(self, p) -> np.ndarray:
+        """Mapea probas crudas `p` a calibradas. Devuelve un array float del mismo largo."""
         p = np.asarray(p, dtype=float)
         if self.method == "isotonic":
             return np.asarray(self._model.predict(p), dtype=float)
