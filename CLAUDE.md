@@ -112,10 +112,21 @@ precisión ~0.67, recall ~0.22. (Cambiarán con el dataset real de Kaggle.)
 
 ## Estado actual
 
-Fases 0-3 completas. **Fase 0:** entorno uv, scaffolding, CI, pre-commit.
-**Fase 1:** ingesta PySpark CSV→Parquet + validación Pandera trazable. **Fase 2:** features
-agnósticas al dominio (fecha + distancia haversine), LightGBM con desbalance, calibración
-isotónica/Platt por Brier, métricas honestas (PR-AUC/Brier) y tracking MLflow; modelo
-calibrado serializado para serving. **Fase 3:** detección de drift por feature (PSI + KS)
-referencia vs producción, con umbrales del config. **31 tests verdes.** Próximo: **Fase 4**
-(serving FastAPI + Docker).
+Fases 0-3 completas y **Fase 4 (serving)** lista a nivel de código + documentación 3 capas.
+**Fase 0:** entorno uv, scaffolding, CI, pre-commit. **Fase 1:** ingesta PySpark + validación
+Pandera trazable. **Fase 2:** features (fecha + haversine), LightGBM con desbalance,
+calibración isotónica/Platt por Brier, métricas honestas + MLflow; modelo serializado.
+**Fase 3:** drift PSI + KS. **Fase 4:** API FastAPI (`/health`, `/predict`) verificada en
+vivo con uvicorn + Dockerfile/compose. **Docs:** `docs/` (vision-tecnica, referencia-codigo,
+glosario). **35 tests verdes.**
+
+### Próximos pasos (handoff a Sonnet 4.6 — ejecución)
+
+1. **Cerrar Fase 4:** instalar Docker (decidido por sudo) y verificar `docker compose up`
+   (API + MLflow). Ajustar el comando si Fedora usa `docker-compose` v1.
+2. **Fase 5:** `scripts/run_pipeline.py --config configs/fraud.yaml` (orquesta
+   ETL→validación→features→train→calibración→eval→drift) + pulir README con métricas reales.
+3. **Pase de docstrings:** estandarizar inputs/outputs/efectos en TODAS las funciones y
+   mantener `docs/referencia-codigo.md` sincronizado.
+4. **Fase 6 (volver a Opus para diseñar):** variante bayesiana (salud) + educación (drift
+   de cohorte), agregando solo `config` + esquema.
