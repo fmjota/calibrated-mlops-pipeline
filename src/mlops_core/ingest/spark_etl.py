@@ -21,7 +21,16 @@ def ingest_csv_to_parquet(
 ) -> str:
     """Lee el CSV crudo, tipa columnas y parsea la fecha, y escribe Parquet.
 
-    Devuelve la ruta del Parquet generado.
+    Args:
+        cfg: config del dominio; usa `data.raw_path`, `data.parquet_path` y `columns.datetime`.
+        spark: SparkSession activa (ver `mlops_core.spark.get_spark`).
+        mode: modo de escritura de Spark ("overwrite" por defecto).
+
+    Returns:
+        str: ruta del directorio Parquet generado (igual a `cfg.data.parquet_path`).
+
+    Efectos secundarios:
+        Escribe un dataset Parquet en disco en `cfg.data.parquet_path`.
     """
     df = spark.read.csv(cfg.data.raw_path, header=True, inferSchema=True)
 

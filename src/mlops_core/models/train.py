@@ -57,7 +57,22 @@ def train_model(
     artifacts_dir: str = "artifacts",
     log_to_mlflow: bool = True,
 ) -> TrainResult:
-    """Entrena, calibra, evalúa, persiste el modelo y (opcional) registra en MLflow."""
+    """Entrena, calibra, evalúa, persiste el modelo y (opcional) registra en MLflow.
+
+    Args:
+        cfg: config del dominio (columnas, params del modelo, calibración, umbral).
+        df: datos crudos validados (pandas), con la columna target.
+        artifacts_dir: carpeta base donde se guarda `<domain>/model.joblib`.
+        log_to_mlflow: si True, registra params, métricas y el artefacto en MLflow.
+
+    Returns:
+        TrainResult: modelo calibrado, métricas (PR-AUC/Brier/ROC-AUC), umbral,
+        método de calibración elegido y ruta del modelo guardado.
+
+    Efectos secundarios:
+        Escribe el modelo serializado en disco y, si `log_to_mlflow`, crea una corrida
+        MLflow (carpeta `mlruns/`).
+    """
     df = _time_sorted(cfg, df)
     X, y = build_features(cfg, df)
     categories = extract_categories(X)

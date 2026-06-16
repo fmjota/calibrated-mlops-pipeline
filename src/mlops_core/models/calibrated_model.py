@@ -39,7 +39,18 @@ class CalibratedModel:
 
 
 def save_model(model: CalibratedModel, artifacts_dir: str = "artifacts") -> str:
-    """Serializa el modelo en artifacts/<domain>/model.joblib y devuelve la ruta."""
+    """Serializa el modelo en artifacts/<domain>/model.joblib y devuelve la ruta.
+
+    Args:
+        model: modelo calibrado a persistir.
+        artifacts_dir: carpeta base; se crea `<artifacts_dir>/<domain>/`.
+
+    Returns:
+        str: ruta del archivo `.joblib` escrito.
+
+    Efectos secundarios:
+        Crea directorios y escribe un archivo joblib en disco.
+    """
     out_dir = Path(artifacts_dir) / model.config.domain
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "model.joblib"

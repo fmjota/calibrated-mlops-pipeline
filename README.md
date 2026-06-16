@@ -60,10 +60,13 @@ Con Docker (próximamente, Fase 4):
 docker compose up             # levanta API de inferencia + MLflow
 ```
 
-## Decisiones técnicas
+## Documentación
 
-Ver la tabla completa y la bitácora en [`CLAUDE.md`](CLAUDE.md).
+El README es la **vitrina**. El "cómo y por qué funciona por dentro" está en `docs/`:
 
-## Por qué así
-
-_(Se completa en la Fase 5 con resultados y justificación de cada elección.)_
+- [`docs/vision-tecnica.md`](docs/vision-tecnica.md) — documento técnico: finalidad,
+  arquitectura, etapas paso a paso, decisiones y porqué, ejemplo input→output.
+- [`docs/referencia-codigo.md`](docs/referencia-codigo.md) — mapa archivo por archivo
+  (propósito, inputs, outputs, dependencias).
+- [`docs/glosario.md`](docs/glosario.md) — términos del dominio y técnicos.
+- [`CLAUDE.md`](CLAUDE.md) — bitácora de decisiones y convenciones.

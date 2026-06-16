@@ -35,7 +35,30 @@ Métricas honestas para desbalance: **PR-AUC** y **Brier**, no accuracy.
   features, models, evaluate, drift, serve).
 - `configs/*.yaml` — un archivo por dominio; parametriza el núcleo.
 - `tests/` — pytest por componente.
-- `scripts/` — `download_data.sh`, `run_pipeline.py` (orquesta el end-to-end por `--config`).
+- `scripts/` — `download_data.sh`, `generate_synthetic.py`, `run_pipeline.py`.
+- `docs/` — documentación en 3 capas (ver abajo): `vision-tecnica.md` (cómo y por qué
+  funciona por dentro), `referencia-codigo.md` (archivo por archivo) y `glosario.md`.
+
+## Estrategia de modelos (Opus para pensar, Sonnet para ejecutar)
+
+- **Opus** (el más reciente; el brief dice "4.8" pero el último real es **4.7**): pensar
+  la idea, arquitectura, esquemas de validación y reglas de drift, trade-offs (LightGBM
+  vs red, isotónica vs Platt), y redactar el **documento técnico + diagramas**.
+- **Sonnet 4.6**: ejecutar lo ya decidido — código, tests, **docstrings**, la
+  **referencia de código**, refactors menores.
+- Antes de cada bloque grande, decir en qué modelo conviene estar y por qué. Al pasar de
+  diseño a "picar código", recordar bajar a Sonnet (`/model claude-sonnet-4-6`).
+
+## Documentación (obligatoria, 3 capas)
+
+1. **Documento técnico** (`docs/vision-tecnica.md`): finalidad, arquitectura (Mermaid),
+   etapas paso a paso (qué entra/ocurre/sale), decisiones y porqué, cómo correr. Es más
+   profundo que el README. **README = vitrina; documento técnico = internals.** No duplicar.
+2. **Documentación del código**: docstrings en cada módulo y función con **inputs**
+   (params+tipos), **outputs** (qué retorna y formato) y **efectos secundarios** (escribe
+   parquet, registra en MLflow). Más `docs/referencia-codigo.md` (archivo por archivo).
+   Mantener docstrings y referencia **sincronizados**.
+3. **Apoyos**: diagramas Mermaid del flujo, **ejemplo input→output** concreto y **glosario**.
 
 ## Comandos
 
@@ -76,6 +99,10 @@ uv run python scripts/run_pipeline.py --config configs/fraud.yaml
   sagrado. En el dataset sintético (0.6% fraude) con 0.90 el umbral quedaba en 1.0 (recall
   ~2%); se fijó en **0.50**, que da un punto de operación ilustrativo (umbral ~0.42,
   precisión ~0.67, recall ~0.22). La calibración elige isotónica vs Platt por Brier.
+- **2026-06-15** — El brief se actualizó con dos reglas transversales nuevas:
+  **estrategia de modelos** (Opus para diseñar, Sonnet 4.6 para ejecutar) y
+  **documentación obligatoria en 3 capas** (`docs/`). Se incorporan a este repo y se
+  retrofitean las fases ya hechas (0-4). "Opus 4.8" del brief = Opus 4.7 real.
 
 ## Resultados de referencia (dataset sintético 200k, 0.6% fraude)
 
