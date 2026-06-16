@@ -6,6 +6,11 @@ ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     PYTHONUNBUFFERED=1
 
+# libgomp1: runtime de OpenMP que LightGBM carga en tiempo de ejecución (no viene en slim).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # uv desde la imagen oficial (sin instalar a nivel de sistema).
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 

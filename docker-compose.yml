@@ -1,6 +1,7 @@
 # Levanta la API de inferencia y la UI de MLflow.
 # Compatible con `docker compose up` y con `podman-compose up`.
 # El modelo entrenado se monta desde ./artifacts (generado por el pipeline en local).
+# La etiqueta `z` en los volúmenes relabela para SELinux (Fedora Enforcing); docker la ignora sin problema.
 services:
   api:
     build: .
@@ -9,7 +10,7 @@ services:
     environment:
       - MODEL_PATH=/app/artifacts/fraud/model.joblib
     volumes:
-      - ./artifacts:/app/artifacts:ro
+      - ./artifacts:/app/artifacts:ro,z
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
@@ -25,4 +26,4 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./mlruns:/mlflow
+      - ./mlruns:/mlflow:z

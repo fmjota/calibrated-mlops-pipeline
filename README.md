@@ -59,6 +59,8 @@ Servir el modelo como API de inferencia:
 
 ```bash
 docker compose up                        # API FastAPI (:8000) + MLflow (:5000)
+# con Podman (rootless, sin sudo — ver docs/podman-vs-docker.md):
+uv tool install podman-compose && podman-compose up -d api
 # o sin contenedor:
 uv run uvicorn mlops_core.serve.api:app --port 8000
 ```
@@ -92,4 +94,5 @@ El README es la **vitrina**. El "cómo y por qué funciona por dentro" está en 
 - [`docs/referencia-codigo.md`](docs/referencia-codigo.md) — mapa archivo por archivo
   (propósito, inputs, outputs, dependencias).
 - [`docs/glosario.md`](docs/glosario.md) — términos del dominio y técnicos.
+- [`docs/podman-vs-docker.md`](docs/podman-vs-docker.md) — por qué/cómo se ejecuta con Podman.
 - [`CLAUDE.md`](CLAUDE.md) — bitácora de decisiones y convenciones.

@@ -103,6 +103,10 @@ uv run python scripts/run_pipeline.py --config configs/fraud.yaml
   **estrategia de modelos** (Opus para diseñar, Sonnet 4.6 para ejecutar) y
   **documentación obligatoria en 3 capas** (`docs/`). Se incorporan a este repo y se
   retrofitean las fases ya hechas (0-4). "Opus 4.8" del brief = Opus 4.7 real.
+- **2026-06-15** — Contenedor se ejecuta con **Podman** (rootless, sin sudo) en vez de
+  Docker: Fedora 44 trae Podman y no Docker. El empaquetado es OCI estándar, así que el
+  mismo `docker-compose.yml` corre con `docker compose` o `podman-compose`. Hubo que
+  añadir `libgomp1` al Dockerfile (LightGBM) y la etiqueta SELinux `z` a los volúmenes.
 
 ## Resultados de referencia (dataset sintético 200k, 0.6% fraude)
 
@@ -120,14 +124,12 @@ calibración isotónica/Platt por Brier, métricas honestas + MLflow; modelo ser
 vivo con uvicorn + Dockerfile/compose. **Docs:** `docs/` (vision-tecnica, referencia-codigo,
 glosario). **35 tests verdes.**
 
-**Fase 5 completa:** `scripts/run_pipeline.py --config configs/fraud.yaml` orquesta
-ETL→validación→train→calibración→eval→drift con resumen legible; README con métricas
-reales + ejemplo curl. **36 tests verdes.**
+**Fases 4 y 5 completas.** Fase 5: `scripts/run_pipeline.py --config configs/fraud.yaml`
+orquesta ETL→validación→train→calibración→eval→drift; README con métricas reales. Fase 4:
+**contenedor verificado con Podman** (rootless, sin sudo) — `/predict` responde desde el
+contenedor. Ver `docs/podman-vs-docker.md`. **36 tests verdes.**
 
 ### Próximos pasos
 
-1. **Cerrar Fase 4:** instalar Docker (decidido por sudo; aún no disponible en el entorno)
-   y verificar `docker compose up` (API + MLflow). Hay **podman 5.8.2** como fallback.
-   Ajustar el comando si Fedora usa `docker-compose` v1.
-2. **Fase 6 (volver a Opus para diseñar):** variante bayesiana (salud) + educación (drift
-   de cohorte), agregando solo `config` + esquema.
+1. **Fase 6 (Opus para diseñar):** variante bayesiana (salud, intervalos de incertidumbre
+   + umbral clínico) + educación (drift de cohorte), agregando solo `config` + esquema.
