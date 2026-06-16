@@ -129,7 +129,31 @@ orquesta ETL→validación→train→calibración→eval→drift; README con mé
 **contenedor verificado con Podman** (rootless, sin sudo) — `/predict` responde desde el
 contenedor. Ver `docs/podman-vs-docker.md`. **36 tests verdes.**
 
-### Próximos pasos
+### Fase 6 — diseño aprobado (implementar en Sonnet 4.6)
 
-1. **Fase 6 (Opus para diseñar):** variante bayesiana (salud, intervalos de incertidumbre
-   + umbral clínico) + educación (drift de cohorte), agregando solo `config` + esquema.
+Decisiones: **PyMC**, **logística bayesiana plana**, **datasets reales UCI** (vía
+`ucimlrepo`), **salud primero, luego educación**.
+
+**Salud (reingreso) — el diferenciador bayesiano:**
+1. Deps nuevas: `pymc`, `ucimlrepo` (pesadas; `uv sync`).
+2. Dataset: UCI "Diabetes 130-US hospitals" (id=296) vía `ucimlrepo` →
+   `scripts/download_health.py`. Target binario: `readmitted` (<30 días vs resto).
+3. `schemas/readmission.py` (Pandera) + registrar en `schemas/__init__`.
+4. `configs/readmission.yaml`: `model.type: bayesian`, `calibration.method: none`,
+   `target_precision` clínico, nivel de IC (ej. 0.90).
+5. **Arquitectura:** `models/bayesian.py` con `BayesianLogisticModel.fit/predict_proba/
+   predict_interval(level)`. Necesita **matriz de diseño numérica** (estandarizar numéricas
+   + one-hot de categóricas de baja cardinalidad) → helper aparte del path LightGBM.
+   Priors débiles `Normal(0,1)` sobre coef estandarizados. **Escala:** subsample
+   estratificado (~10k) + NUTS para posterior honesta (ADVI como fallback rápido).
+6. `train_model` ramifica por `cfg.model.type`; métricas iguales (PR-AUC, Brier) +
+   **cobertura del intervalo** (fracción de positivos dentro del IC = calibración de la
+   incertidumbre). El wrapper de serving lleva el modelo y expone `ci_low/ci_high`.
+7. Serving: `PredictionResponse` con `ci_low/ci_high` opcionales (None si no es bayesiano).
+8. Tests: esquema accept/reject; el bayesiano entrena en subsample y da proba + IC con
+   low<high; end-to-end mínimo.
+
+**Educación (deserción) — reutiliza el núcleo LightGBM:** `scripts/download_education.py`
+(UCI id=697), `schemas/dropout.py`, `configs/dropout.yaml` (`model.type: lightgbm`);
+demuestra **drift de cohorte**. Cero código nuevo de modelo: ese es el argumento de
+generalización.
