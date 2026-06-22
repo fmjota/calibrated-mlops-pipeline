@@ -1,6 +1,6 @@
 # Datos
 
-Los datasets **no se versionan** (ver `.gitignore`). Se descargan con:
+Los datasets no se versionan (ver `.gitignore`). Se descargan con:
 
 ```bash
 bash scripts/download_data.sh
@@ -8,8 +8,8 @@ bash scripts/download_data.sh
 
 ## Dominio banca/fraude (dataset inicial)
 
-*Credit Card Transactions Fraud Detection* (simulado con Sparkov). Esquema tabular rico
-(monto, comercio, categoría, geo, tiempo) y desbalance fuerte (~0.5% de fraude), ideal
+*Credit Card Transactions Fraud Detection* (simulado con Sparkov). Esquema tabular
+(monto, comercio, categoría, geo, tiempo) con desbalance fuerte (~0.5% de fraude), útil
 para demostrar validación, calibración y manejo de clases desbalanceadas.
 
 Estructura esperada tras la descarga:

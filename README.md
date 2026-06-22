@@ -1,24 +1,24 @@
 # Pipeline de MLOps de extremo a extremo
 
-> De datos crudos a producción de forma **validada, calibrada y monitoreada**.
-> Un núcleo reutilizable que se demuestra sobre tres dominios —banca, salud y
-> educación— cambiando solo configuración y esquema, no reescribiendo el pipeline.
+> De datos crudos a producción de forma validada, calibrada y monitoreada.
+> Un núcleo reutilizable que se demuestra sobre tres dominios (banca, salud y
+> educación) cambiando solo configuración y esquema, no reescribiendo el pipeline.
 
 [![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue)](.github/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 
-## Pitch
+## El problema
 
-La mayoría de los pipelines fallan en producción no por el modelo, sino por **datos
-corruptos** que entran sin avisar o por **degradación silenciosa**. Este proyecto ataca
-justo eso con un sello de rigor estadístico:
+La mayoría de los pipelines fallan en producción no por el modelo, sino por datos
+corruptos que entran sin avisar o por degradación silenciosa. Este proyecto ataca
+justo eso con rigor estadístico:
 
-- **Validación temprana y trazable** (Pandera): si los datos rompen el contrato, fallamos
+- Validación temprana y trazable (Pandera): si los datos rompen el contrato, fallamos
   antes del modelo, con un reporte claro.
-- **Probabilidades calibradas** (isotónica/Platt + **Brier**): el umbral de decisión
-  significa algo real (umbral de bloqueo de fraude, umbral clínico, umbral de intervención).
-- **Métricas honestas para desbalance**: **PR-AUC** y **Brier**, no accuracy.
-- **Monitoreo de drift** (PSI/KS): detección de señales aplicada al propio modelo.
+- Probabilidades calibradas (isotónica/Platt, elegidas por Brier): el umbral de decisión
+  significa algo real (bloqueo de fraude, umbral clínico, umbral de intervención).
+- Métricas honestas para el desbalance: PR-AUC y Brier, no accuracy.
+- Monitoreo de drift (PSI/KS): detección de señales aplicada al propio modelo.
 
 ## Arquitectura
 
@@ -40,11 +40,11 @@ flowchart LR
 
 ## Dominios (mismo núcleo, distinto config + esquema)
 
-| Dominio | Caso | Técnica que luce |
+| Dominio | Caso | Técnica destacada |
 |---|---|---|
 | Banca/retail | Fraude transaccional de tarjetas | Probabilidad calibrada para el umbral de bloqueo; PR-AUC por el desbalance |
-| Salud | Reingreso / evento adverso | Umbral clínico; **variante bayesiana** con intervalos de incertidumbre |
-| Educación | Riesgo de deserción | Probabilidad calibrada para priorizar intervenciones; **drift** entre cohortes |
+| Salud | Reingreso / evento adverso | Umbral clínico; variante bayesiana con intervalos de incertidumbre |
+| Educación | Riesgo de deserción | Probabilidad calibrada para priorizar intervenciones; drift entre cohortes |
 
 ## Cómo correr
 
@@ -59,7 +59,7 @@ Servir el modelo como API de inferencia:
 
 ```bash
 docker compose up                        # API FastAPI (:8000) + MLflow (:5000)
-# con Podman (rootless, sin sudo — ver docs/podman-vs-docker.md):
+# con Podman (rootless, sin sudo; ver docs/podman-vs-docker.md):
 uv tool install podman-compose && podman-compose up -d api
 # o sin contenedor:
 uv run uvicorn mlops_core.serve.api:app --port 8000
@@ -83,16 +83,15 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{
 | Punto de operación @ precisión objetivo 0.50 | umbral **0.42** · precisión 0.67 · recall 0.22 | knob de negocio en el `config` |
 
 > Métricas reproducibles con `run_pipeline.py`. Cambiarán con el dataset real de Kaggle.
-> El umbral se **deriva** de una precisión objetivo: significa algo, no es arbitrario.
+> El umbral se deriva de una precisión objetivo: significa algo, no es arbitrario.
 
 ## Documentación
 
-El README es la **vitrina**. El "cómo y por qué funciona por dentro" está en `docs/`:
+El README resume; el detalle de cómo y por qué funciona por dentro está en `docs/`:
 
-- [`docs/vision-tecnica.md`](docs/vision-tecnica.md) — documento técnico: finalidad,
-  arquitectura, etapas paso a paso, decisiones y porqué, ejemplo input→output.
-- [`docs/referencia-codigo.md`](docs/referencia-codigo.md) — mapa archivo por archivo
+- [`docs/vision-tecnica.md`](docs/vision-tecnica.md): documento técnico con finalidad,
+  arquitectura, etapas paso a paso, decisiones y ejemplo input→output.
+- [`docs/referencia-codigo.md`](docs/referencia-codigo.md): mapa archivo por archivo
   (propósito, inputs, outputs, dependencias).
-- [`docs/glosario.md`](docs/glosario.md) — términos del dominio y técnicos.
-- [`docs/podman-vs-docker.md`](docs/podman-vs-docker.md) — por qué/cómo se ejecuta con Podman.
-- [`CLAUDE.md`](CLAUDE.md) — bitácora de decisiones y convenciones.
+- [`docs/glosario.md`](docs/glosario.md): términos del dominio y técnicos.
+- [`docs/podman-vs-docker.md`](docs/podman-vs-docker.md): cómo y por qué se ejecuta con Podman.
